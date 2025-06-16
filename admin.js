@@ -22,7 +22,7 @@ document.getElementById('uploadContact').addEventListener('click', async () => {
   const filename = `contacts/contact_${Date.now()}.json`;
   const token = prompt("Entre ton token GitHub personnel (repo access):");
 
-  await fetch(`https://api.github.com/repos/TON_UTILISATEUR/TON_REPO/contents/${filename}`, {
+  await fetch(`https://api.github.com/repos/Qualitech-conseil/NFC_Contact_Card/contents/${filename}`, {
     method: 'PUT',
     headers: {
       'Authorization': `token ${token}`,
