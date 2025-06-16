@@ -1,0 +1,1 @@
+// JS pour sauvegarder et générer un lien
