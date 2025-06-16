@@ -49,7 +49,7 @@
   function saveToFlatFile(data) {
     const id = Date.now();
     const filename = `contacts/${id}.json`;
-    fetch(`https://api.github.com/repos/Qualitech-conseil/NFC_Contact_Card/contents/${filename}`, {
+    fetch(`https://api.github.com/repos/Qualitech-conseil/NFC_Contact_Card/contacts/${filename}`, {
       method: 'PUT',
       headers: {
         'Authorization': 'Bearer VOTRE_TOKEN_PERSONNEL',
