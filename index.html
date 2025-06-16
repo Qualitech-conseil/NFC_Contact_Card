@@ -98,7 +98,8 @@
         .then(data => {
           document.body.innerHTML = `
             <div class="container">
-              <h2>${data.prenom} ${data.nom}</h2>
+              <p><strong>Entreprise:</strong>${data.prenom || ''}</p>
+              <p><strong>Entreprise:</strong>${data.nom || ''}</p>
               <p><strong>Entreprise:</strong> ${data.entreprise || ''}</p>
               <p><strong>Fonction:</strong> ${data.fonction || ''}</p>
               <p><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
