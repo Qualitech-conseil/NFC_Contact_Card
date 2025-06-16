@@ -52,7 +52,7 @@
     fetch(`https://api.github.com/repos/Qualitech-conseil/NFC_Contact_Card/${filename}`, {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer VOTRE_TOKEN_PERSONNEL',
+        'Authorization': 'Bearer carte',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
