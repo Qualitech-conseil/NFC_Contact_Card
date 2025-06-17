@@ -2,45 +2,74 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Carte Contact</title>
+  <title>Fiche Contact</title>
   <style>
-    body { font-family: Arial; padding: 20px; background: #f0f0f0; }
-    .card { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
-    img { max-width: 100%; border-radius: 10px; }
+    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+    .container { background: white; max-width: 500px; margin: auto; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+    img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
+    .field { margin-bottom: 10px; }
+    .field label { font-weight: bold; display: block; }
   </style>
 </head>
 <body>
-  <div class="card" id="card"></div>
+  <div class="container" id="contactContainer">Chargement...</div>
+
   <script>
-    async function loadContact() {
+    async function fetchContactData() {
       const params = new URLSearchParams(window.location.search);
-      const id = params.get("id");
-      if (!id) return document.getElementById("card").innerText = "ID manquant.";
-      const res = await fetch("contacts/" + id + ".json");
-      const data = await res.json();
-      document.getElementById("card").innerHTML = \`
-        <img src="photos/\${data.id_photo}" alt="Photo de \${data.prenom}">
-        <p><strong>Entreprise:</strong>\${data.prenom} </p>
-        <p><strong>Entreprise:</strong> \${data.nom}</p>
-        <p><strong>Entreprise:</strong> \${data.societe}</p>
-        <p><strong>Fonction:</strong> \${data.fonction}</p>
-        <p><strong>Email:</strong> <a href="mailto:\${data.email}">\${data.email}</a></p>
-        <p><strong>Téléphone:</strong> <a href="tel:\${data.telephone}">\${data.telephone}</a></p>
-        <p><strong>Site Web:</strong> <a href="\${data.site_web}" target="_blank">\${data.site_web}</a></p>
-        <p><strong>Description:</strong> \${data.description}</p>
-        <p>
-          <a href="\${data.instagram}">Instagram</a> |
-          <a href="\${data.linkedin}">LinkedIn</a> |
-          <a href="\${data.google_business}">Google Business</a> |
-          <a href="\${data.facebook}">Facebook</a>
-        </p>
-        <br>
-        <a href="data:text/vcard;charset=utf-8,BEGIN:VCARD%0AVERSION:3.0%0AFN:\${data.prenom} \${data.nom}%0AORG:\${data.societe}%0ATITLE:\${data.fonction}%0AEMAIL:\${data.email}%0ATEL:\${data.telephone}%0AURL:\${data.site_web}%0AEND:VCARD" download="\${data.prenom}_\${data.nom}.vcf">
-          <button>Ajouter au répertoire</button>
-        </a>
-      \`;
+      const id = params.get('id');
+
+      if (!id) {
+        document.getElementById('contactContainer').innerText = "Aucun ID fourni.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`contacts/${id}.json`);
+        if (!response.ok) throw new Error('Contact introuvable');
+        const data = await response.json();
+
+        const vcfData = `BEGIN:VCARD
+VERSION:3.0
+N:${data.nom};${data.prenom}
+FN:${data.prenom} ${data.nom}
+ORG:${data.societe}
+TITLE:${data.fonction}
+TEL:${data.telephone}
+EMAIL:${data.email}
+URL:${data.siteweb}
+NOTE:${data.description}
+END:VCARD`;
+
+        const blob = new Blob([vcfData], { type: "text/vcard" });
+        const vcfURL = URL.createObjectURL(blob);
+
+        document.getElementById('contactContainer').innerHTML = `
+          <img src="photos/${data.photo}" alt="Photo de ${data.prenom}" />
+          <div class="field"><label>Nom :</label>${data.prenom} ${data.nom}</div>
+          <div class="field"><label>Entreprise :</label>${data.societe}</div>
+          <div class="field"><label>Fonction :</label>${data.fonction}</div>
+          <div class="field"><label>Téléphone :</label><a href="tel:${data.telephone}">${data.telephone}</a></div>
+          <div class="field"><label>Email :</label><a href="mailto:${data.email}">${data.email}</a></div>
+          <div class="field"><label>Site web :</label><a href="${data.siteweb}" target="_blank">${data.siteweb}</a></div>
+          <div class="field"><label>Description :</label>${data.description}</div>
+          <div class="field"><label>Réseaux sociaux :</label>
+            ${data.instagram ? `<a href="${data.instagram}" target="_blank">Instagram</a><br>` : ''}
+            ${data.linkedin ? `<a href="${data.linkedin}" target="_blank">LinkedIn</a><br>` : ''}
+            ${data.googlebusiness ? `<a href="${data.googlebusiness}" target="_blank">Google Business</a><br>` : ''}
+            ${data.facebook ? `<a href="${data.facebook}" target="_blank">Facebook</a>` : ''}
+          </div>
+          <br>
+          <a href="${vcfURL}" download="${data.nom}_${data.prenom}.vcf">
+            <button>Ajouter à mes contacts</button>
+          </a>
+        `;
+      } catch (error) {
+        document.getElementById('contactContainer').innerText = "Erreur : " + error.message;
+      }
     }
-    loadContact();
+
+    fetchContactData();
   </script>
 </body>
 </html>
