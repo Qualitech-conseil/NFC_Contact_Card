@@ -53,7 +53,12 @@
       background-color: #0056b3;
     }
     a { text-decoration: none; color: inherit; }
+    .qr {
+      text-align: center;
+      margin-top: 20px;
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body>
   <div class="container" id="contactContainer">Chargement...</div>
@@ -78,6 +83,8 @@
         const blob = new Blob([vcfData], { type: "text/vcard" });
         const vcfURL = URL.createObjectURL(blob);
 
+        const fullUrl = window.location.href;
+
         document.getElementById('contactContainer').innerHTML = `
           <img src="photos/${data.photo}" alt="Photo de ${data.prenom}" />
           <div class="field"><label>Nom :</label>${data.prenom} ${data.nom}</div>
@@ -97,7 +104,14 @@
           <a href="${vcfURL}" download="${data.nom}_${data.prenom}.vcf">
             <button>Ajouter à mes contacts</button>
           </a>
+          <div class="qr">
+            <canvas id="qrCodeCanvas"></canvas>
+          </div>
         `;
+
+        QRCode.toCanvas(document.getElementById("qrCodeCanvas"), fullUrl, function (error) {
+          if (error) console.error(error);
+        });
       } catch (error) {
         document.getElementById('contactContainer').innerText = "Erreur : " + error.message;
       }
