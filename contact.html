@@ -3,12 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <title>Fiche Contact</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
-    .container { background: white; max-width: 500px; margin: auto; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
-    img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
-    .field { margin-bottom: 10px; }
-    .field label { font-weight: bold; display: block; }
+    body {
+      font-family: Arial; 
+      padding: 0; 
+      margin: 0; 
+      background: #f4f4f4;
+    }
+    .container {
+      background: white;
+      max-width: 100%;
+      margin: auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .field {
+      margin-bottom: 10px;
+    }
+    .field label {
+      font-weight: bold;
+      display: block;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    a { text-decoration: none; color: inherit; }
   </style>
 </head>
 <body>
@@ -29,17 +73,7 @@
         if (!response.ok) throw new Error('Contact introuvable');
         const data = await response.json();
 
-        const vcfData = `BEGIN:VCARD
-VERSION:3.0
-N:${data.nom};${data.prenom}
-FN:${data.prenom} ${data.nom}
-ORG:${data.societe}
-TITLE:${data.fonction}
-TEL:${data.telephone}
-EMAIL:${data.email}
-URL:${data.siteweb}
-NOTE:${data.description}
-END:VCARD`;
+        const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:${data.nom};${data.prenom}\nFN:${data.prenom} ${data.nom}\nORG:${data.societe}\nTITLE:${data.fonction}\nTEL:${data.telephone}\nEMAIL:${data.email}\nURL:${data.siteweb}\nNOTE:${data.description}\nEND:VCARD`;
 
         const blob = new Blob([vcfData], { type: "text/vcard" });
         const vcfURL = URL.createObjectURL(blob);
