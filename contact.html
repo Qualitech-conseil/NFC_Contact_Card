@@ -20,7 +20,8 @@
       const data = await res.json();
       document.getElementById("card").innerHTML = \`
         <img src="photos/\${data.id_photo}" alt="Photo de \${data.prenom}">
-        <h2>\${data.prenom} \${data.nom}</h2>
+        <p><strong>Entreprise:</strong>\${data.prenom} </p>
+        <p><strong>Entreprise:</strong> \${data.nom}</p>
         <p><strong>Entreprise:</strong> \${data.societe}</p>
         <p><strong>Fonction:</strong> \${data.fonction}</p>
         <p><strong>Email:</strong> <a href="mailto:\${data.email}">\${data.email}</a></p>
