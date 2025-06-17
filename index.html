@@ -2,25 +2,40 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Générateur de Lien Contact</title>
+  <title>Créateur de lien NFC</title>
   <style>
-    body { font-family: Arial; padding: 20px; background: #f9f9f9; }
-    .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
-    input, button { width: 100%; padding: 10px; margin-top: 10px; }
+    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+    .container { background: white; max-width: 400px; margin: auto; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+    input, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    #linkOutput { margin-top: 20px; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Créer un lien court pour NFC</h2>
-    <input type="text" id="contactId" placeholder="ID du contact (ex. id0001)" />
+    <h2>Créer un lien NFC</h2>
+    <label for="contactId">ID du contact :</label>
+    <input type="text" id="contactId" placeholder="Exemple : id0002" />
     <button onclick="generateLink()">Créer le lien</button>
-    <p id="output"></p>
+    <div id="linkOutput"></div>
   </div>
+
   <script>
     function generateLink() {
       const id = document.getElementById('contactId').value.trim();
-      const url = `${window.location.origin}${window.location.pathname.replace('index.html', '')}contact.html?id=${id}`;
-      document.getElementById('output').innerHTML = \`<input value="\${url}" readonly><button onclick="navigator.clipboard.writeText('\${url}')">Copier</button>\`;
+      if (!id) {
+        alert("Merci de saisir un ID");
+        return;
+      }
+
+      // Chemin vers la page d'affichage de la carte
+      const baseURL = `${window.location.origin}${window.location.pathname.replace('index.html', '')}`;
+      const link = `${baseURL}contact.html?id=${encodeURIComponent(id)}`;
+
+      document.getElementById('linkOutput').innerHTML = `
+        <p>Lien généré :</p>
+        <input type="text" value="${link}" readonly>
+        <button onclick="navigator.clipboard.writeText('${link}')">Copier le lien</button>
+      `;
     }
   </script>
 </body>
