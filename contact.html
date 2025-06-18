@@ -65,9 +65,9 @@
 
   <script>
     async function fetchContactData() {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
-
+      const id = window.location.search.substring(1); // Extrait "candice_baylaud"
+      const response = await fetch(`contacts/${id}.json`);
+  
       if (!id) {
         document.getElementById('contactContainer').innerText = "Aucun ID fourni.";
         return;
