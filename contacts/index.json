@@ -1,6 +1,6 @@
 [
-  { "id": "id0001", "prenom": "Alain", "nom": "Roura" },
-  { "id": "id0002", "prenom": "Candice", "nom": "Baylaud" },
-  { "id": "id0003", "prenom": "Marc", "nom": "Durand" }
-  { "id": "id0004", "prenom": "Franck", "nom": "Ciornei" }
+  { "id": "Alain_Roura", "prenom": "Alain", "nom": "Roura" },
+  { "id": "Candice_Baylaud", "prenom": "Candice", "nom": "Baylaud" },
+  { "id": "Marc_durand", "prenom": "Marc", "nom": "Durand" }
+  { "id": "Franck_Ciornei", "prenom": "Franck", "nom": "Ciornei" }
 ]
