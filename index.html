@@ -10,6 +10,39 @@
     #linkOutput { margin-top: 20px; }
   </style>
 </head>
+
+  <label for="contactSelect">Sélectionner un contact :</label>
+<select id="contactSelect">
+  <option value="">-- Choisir un contact --</option>
+</select>
+
+<input type="text" id="contactId" placeholder="ID du contact" readonly />
+
+<script>
+  async function chargerContacts() {
+    try {
+      const response = await fetch('contacts/index.json'); // Ce fichier contiendra la liste des fichiers contacts
+      const contacts = await response.json();
+
+      const select = document.getElementById('contactSelect');
+      contacts.forEach(contact => {
+        const option = document.createElement('option');
+        option.value = contact.id;
+        option.textContent = `${contact.prenom} ${contact.nom}`;
+        select.appendChild(option);
+      });
+
+      select.addEventListener('change', (e) => {
+        document.getElementById('contactId').value = e.target.value;
+      });
+
+    } catch (e) {
+      console.error("Erreur chargement contacts:", e);
+    }
+  }
+
+  chargerContacts();
+</script>
 <body>
   <div class="container">
     <h2>Créer un lien NFC</h2>
