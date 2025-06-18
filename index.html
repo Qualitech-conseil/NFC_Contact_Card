@@ -2,71 +2,154 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Générateur de lien court</title>
+  <title>Fiche Contact</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial;
+      padding: 0;
+      margin: 0;
+      background: #f4f4f4;
+    }
+    .container {
+      background: white;
+      max-width: 100%;
+      margin: auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .field {
+      margin-bottom: 10px;
+    }
+    .field label {
+      font-weight: bold;
+      display: block;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 20px;
+      font-size: 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    .qr {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body>
-  <h1>Générateur de lien court vers fiche contact</h1>
-  <form id="linkForm">
-    <!-- Menu déroulant des contacts -->
-    <label for="contactSelect">Choisir un contact :</label>
+  <div class="container" id="contactContainer">
+    <label for="contactSelect">Sélectionner un contact :</label>
     <select id="contactSelect">
-      <option value="">-- Sélectionnez un contact --</option>
+      <option value="">-- Choisissez un contact --</option>
     </select>
-    <!-- Champ caché qui recevra l'ID (nom_prenom) -->
-    <input type="hidden" id="contactID" name="id" />
+    <button onclick="goToContact()">Voir la fiche</button>
+    <hr><br>
+    <div id="contactDisplay">Chargement...</div>
+  </div>
 
-    <!-- Bouton pour générer le lien -->
-    <button type="button" onclick="generateLink()">Générer le lien</button>
-  </form>
-
-  <!-- Affichage du lien généré -->
-  <p>Lien généré : <a id="shortLink" href="#" target="_blank">--</a></p>
-
-  <!-- Script JavaScript pour charger le JSON et gérer le dropdown -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Charger le fichier contacts/index.json
-      fetch('contacts/index.json')
-        .then(response => {
-          if (!response.ok) throw new Error('Impossible de charger les contacts');
-          return response.json();
-        })
-        .then(data => {
-          const select = document.getElementById('contactSelect');
-          data.forEach(contact => {
-            const option = document.createElement('option');
-            option.value = contact.id;  // ex: "Jean_Dupont"
-            option.textContent = contact.prenom + ' ' + contact.nom; // ex: "Jean Dupont"
-            select.appendChild(option);
-          });
-        })
-        .catch(err => console.error('Erreur:', err));
+    async function fetchContactList() {
+      try {
+        const response = await fetch('contacts/index.json');
+        const data = await response.json();
+        const select = document.getElementById('contactSelect');
 
-      // Quand on change la sélection, mettre à jour le champ ID caché
-      document.getElementById('contactSelect').addEventListener('change', function() {
-        document.getElementById('contactID').value = this.value;
-      });
-    });
-
-    // Fonction pour générer et afficher le lien court
-    function generateLink() {
-      const id = document.getElementById('contactID').value;
-      if (!id) {
-        alert("Veuillez sélectionner un contact.");
-        return;
+        data.forEach(contact => {
+          const option = document.createElement('option');
+          option.value = contact.filename;
+          option.text = `${contact.prenom} ${contact.nom}`;
+          select.appendChild(option);
+        });
+      } catch (e) {
+        console.error('Erreur chargement index.json', e);
       }
-      // Construction du lien (contact.html?nom_prenom)
-      const url = window.location.origin + window.location.pathname.replace(/index\.html$/, '') 
-                + 'contact.html?' + encodeURIComponent(id);
-      // Afficher le lien dans la page
-      const link = document.getElementById('shortLink');
-      link.href = url;
-      link.textContent = url;
     }
-  </script>
-</body>
-</html>
+
+    function goToContact() {
+      const selected = document.getElementById('contactSelect').value;
+      if (selected) {
+        window.location.href = `contact.html?${selected}`;
+      }
     }
+
+    fetchContactList();
+
+    async function fetchContactData() {
+      const id = window.location.search.substring(1); // "prenom_nom"
+      if (!id) return;
+
+      try {
+        const response = await fetch(`contacts/${id}.json`);
+        if (!response.ok) throw new Error('Contact introuvable');
+        const data = await response.json();
+
+        const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:${data.nom};${data.prenom}\nFN:${data.prenom} ${data.nom}\nORG:${data.societe}\nTITLE:${data.fonction}\nTEL:${data.telephone}\nEMAIL:${data.email}\nURL:${data.siteweb}\nNOTE:${data.description}\nEND:VCARD`;
+
+        const blob = new Blob([vcfData], { type: "text/vcard" });
+        const vcfURL = URL.createObjectURL(blob);
+
+        const fullUrl = window.location.href;
+
+        document.getElementById('contactDisplay').innerHTML = `
+          <img src="photos/${data.photo}" alt="Photo de ${data.prenom}" />
+          <div class="field"><label>Nom :</label>${data.prenom} ${data.nom}</div>
+          <div class="field"><label>Entreprise :</label>${data.societe}</div>
+          <div class="field"><label>Fonction :</label>${data.fonction}</div>
+          <div class="field"><label>Téléphone :</label><a href="tel:${data.telephone}">${data.telephone}</a></div>
+          <div class="field"><label>Email :</label><a href="mailto:${data.email}">${data.email}</a></div>
+          <div class="field"><label>Site web :</label><a href="${data.siteweb}" target="_blank">${data.siteweb}</a></div>
+          <div class="field"><label>Description :</label>${data.description}</div>
+          <div class="field"><label>Réseaux sociaux :</label>
+            ${data.instagram ? `<a href="${data.instagram}" target="_blank">Instagram</a><br>` : ''}
+            ${data.linkedin ? `<a href="${data.linkedin}" target="_blank">LinkedIn</a><br>` : ''}
+            ${data.googlebusiness ? `<a href="${data.googlebusiness}" target="_blank">Google Business</a><br>` : ''}
+            ${data.facebook ? `<a href="${data.facebook}" target="_blank">Facebook</a>` : ''}
+          </div>
+          <br>
+          <a href="${vcfURL}" download="${data.nom}_${data.prenom}.vcf">
+            <button>Ajouter à mes contacts</button>
+          </a>
+          <div class="qr">
+            <canvas id="qrCodeCanvas"></canvas>
+          </div>
+        `;
+
+        QRCode.toCanvas(document.getElementById("qrCodeCanvas"), fullUrl, function (error) {
+          if (error) console.error(error);
+        });
+      } catch (error) {
+        document.getElementById('contactDisplay').innerText = "Erreur : " + error.message;
+      }
+    }
+
+    fetchContactData();
   </script>
 </body>
 </html>
