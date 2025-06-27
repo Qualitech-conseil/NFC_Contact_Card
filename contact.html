@@ -68,7 +68,7 @@
 
   <script>
     async function fetchContactData() {
-      const id = window.location.search.substring(1); // "prenom_nom"
+      const id = window.location.search.substring(1); // ex: Hocquerelle_Thierry
 
       if (!id) {
         document.getElementById('contactContainer').innerText = "Aucun ID fourni.";
@@ -80,11 +80,35 @@
         if (!response.ok) throw new Error('Contact introuvable');
         const data = await response.json();
 
-        const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:${data.nom};${data.prenom}\nFN:${data.prenom} ${data.nom}\nORG:${data.societe}\nTITLE:${data.fonction}\nTEL:${data.telephone}\nEMAIL:${data.email}\nURL:${data.siteweb}\nNOTE:${data.description}\nEND:VCARD`;
+        // Chargement et conversion base64 de la photo
+        const photoBase64 = await fetch(`photos/${data.photo}`)
+          .then(res => res.blob())
+          .then(blob => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const base64 = reader.result.split(',')[1];
+              resolve(base64);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          }));
+
+        // Création de la vCard avec photo intégrée
+        const vcfData = `BEGIN:VCARD
+VERSION:3.0
+N:${data.nom};${data.prenom}
+FN:${data.prenom} ${data.nom}
+ORG:${data.societe}
+TITLE:${data.fonction}
+TEL:${data.telephone}
+EMAIL:${data.email}
+URL:${data.siteweb}
+NOTE:${data.description}
+PHOTO;ENCODING=b;TYPE=JPEG:${photoBase64}
+END:VCARD`;
 
         const blob = new Blob([vcfData], { type: "text/vcard" });
         const vcfURL = URL.createObjectURL(blob);
-
         const fullUrl = window.location.href;
 
         document.getElementById('contactContainer').innerHTML = `
@@ -108,6 +132,10 @@
           </a>
           <div class="qr">
             <canvas id="qrCodeCanvas"></canvas>
+          </div>
+          <div class="field">
+            <label>Propulsé par Qualitech-conseil</label>
+            <a href="mailto:contact@qualitech-conseil.com">contact@qualitech-conseil.com</a>
           </div>
         `;
 
