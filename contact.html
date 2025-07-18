@@ -100,7 +100,8 @@ N:${data.nom};${data.prenom}
 FN:${data.prenom} ${data.nom}
 ORG:${data.societe}
 TITLE:${data.fonction}
-TEL:${data.telephone}
+TEL1:${data.telephone1}
+TEL2:${data.telephone2}
 EMAIL:${data.email}
 URL:${data.siteweb}
 NOTE:${data.description}
@@ -116,7 +117,8 @@ END:VCARD`;
           <div class="field"><label>Nom :</label>${data.prenom} ${data.nom}</div>
           <div class="field"><label>Entreprise :</label>${data.societe}</div>
           <div class="field"><label>Fonction :</label>${data.fonction}</div>
-          <div class="field"><label>Téléphone :</label><a href="tel:${data.telephone}">${data.telephone}</a></div>
+          <div class="field"><label>Téléphone :</label><a href="tel:${data.telephone1}">${data.telephone1}</a></div>
+          <div class="field"><label>Téléphone :</label><a href="tel:${data.telephone2}">${data.telephone2}</a></div>
           <div class="field"><label>Email :</label><a href="mailto:${data.email}">${data.email}</a></div>
           <div class="field"><label>Site web :</label><a href="${data.siteweb}" target="_blank">${data.siteweb}</a></div>
           <div class="field"><label>Description :</label>${data.description}</div>
